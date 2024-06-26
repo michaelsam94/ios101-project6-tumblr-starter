@@ -14,15 +14,24 @@ class ViewController: UIViewController, UITableViewDataSource {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationController?.navigationBar.prefersLargeTitles = true
 
         tableView.dataSource = self
         fetchPosts()
 
     }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        guard let selectdIndex = tableView.indexPathForSelectedRow else {
+            return
+        }
+        tableView.deselectRow(at: selectdIndex, animated: animated)
+    }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return posts.count
     }
+    
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "PostCell", for: indexPath) as! PostCell
@@ -37,6 +46,14 @@ class ViewController: UIViewController, UITableViewDataSource {
         }
 
         return cell
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        guard let selectedIndex = tableView.indexPathForSelectedRow else {
+            return
+        }
+        let detailViewController = segue.destination as! PostDetailViewController
+        detailViewController.post = posts[selectedIndex.row]
     }
 
     func fetchPosts() {
